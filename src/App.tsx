@@ -60,6 +60,7 @@ export default function App() {
       }
       return [...prev, { ...item, quantity: qty }];
     });
+    // Reset quantity back to 1 after adding
     setItemQuantities((prev) => ({ ...prev, [item.id]: 1 }));
   };
 
@@ -112,123 +113,128 @@ export default function App() {
           <h1 className="text-xl font-bold tracking-wider">園遊會點餐系統</h1>
         </div>
 
-        {/* Menu Grid */}
-        <div className="p-4 overflow-y-auto border-b border-slate-100 shrink-0">
-          <h2 className="text-sm font-semibold text-slate-500 mb-3 uppercase tracking-wider flex items-center gap-2">
-            <Coffee size={16} /> 飲品 (Drinks)
-          </h2>
-          <div className="grid grid-cols-2 gap-3 mb-6">
-            {MENU_ITEMS.filter((i) => i.category === 'drink').map((item) => (
-              <div
-                key={item.id}
-                className="bg-blue-50 border border-blue-200 rounded-xl p-3 flex flex-col h-auto"
-              >
-                <div className="font-bold text-blue-900 leading-tight mb-1">{item.name}</div>
-                <div className="text-blue-600 font-medium mb-3">${item.price}</div>
-                <div className="mt-auto flex flex-col gap-2">
-                  <div className="flex items-center bg-white rounded-lg border border-blue-200 shadow-sm">
-                    <button onClick={() => setQty(item.id, -1)} className="p-1.5 flex-1 hover:bg-blue-100 rounded-l-lg text-blue-700 flex justify-center transition-colors">
-                      <Minus size={16} />
-                    </button>
-                    <span className="w-8 text-center font-semibold text-blue-900">{getQty(item.id)}</span>
-                    <button onClick={() => setQty(item.id, 1)} className="p-1.5 flex-1 hover:bg-blue-100 rounded-r-lg text-blue-700 flex justify-center transition-colors">
-                      <Plus size={16} />
+        {/* Menu Grid - Scrollable area */}
+        <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-6">
+          <div>
+            <h2 className="text-sm font-semibold text-slate-500 mb-3 uppercase tracking-wider flex items-center gap-2">
+              <Coffee size={16} /> 飲品 (Drinks)
+            </h2>
+            <div className="grid grid-cols-2 gap-3">
+              {MENU_ITEMS.filter((i) => i.category === 'drink').map((item) => (
+                <div
+                  key={item.id}
+                  className="bg-blue-50 border border-blue-200 rounded-xl p-3 flex flex-col h-auto"
+                >
+                  <div className="font-bold text-blue-900 leading-tight mb-1">{item.name}</div>
+                  <div className="text-blue-600 font-medium mb-3">${item.price}</div>
+                  <div className="mt-auto flex flex-col gap-2">
+                    <div className="flex items-center bg-white rounded-lg border border-blue-200 shadow-sm">
+                      <button onClick={() => setQty(item.id, -1)} className="p-1.5 flex-1 hover:bg-blue-100 rounded-l-lg text-blue-700 flex justify-center transition-colors">
+                        <Minus size={16} />
+                      </button>
+                      <span className="w-8 text-center font-semibold text-blue-900">{getQty(item.id)}</span>
+                      <button onClick={() => setQty(item.id, 1)} className="p-1.5 flex-1 hover:bg-blue-100 rounded-r-lg text-blue-700 flex justify-center transition-colors">
+                        <Plus size={16} />
+                      </button>
+                    </div>
+                    <button
+                      onClick={() => handleAddToCart(item)}
+                      className="w-full bg-blue-600 hover:bg-blue-700 text-white py-1.5 rounded-lg text-sm font-bold shadow-sm transition-colors active:scale-95"
+                    >
+                      加入
                     </button>
                   </div>
-                  <button
-                    onClick={() => handleAddToCart(item)}
-                    className="w-full bg-blue-600 hover:bg-blue-700 text-white py-1.5 rounded-lg text-sm font-bold shadow-sm transition-colors active:scale-95"
-                  >
-                    加入
-                  </button>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
 
-          <h2 className="text-sm font-semibold text-slate-500 mb-3 uppercase tracking-wider flex items-center gap-2">
-            <Cookie size={16} /> 點心 (Snacks)
-          </h2>
-          <div className="grid grid-cols-2 gap-3">
-            {MENU_ITEMS.filter((i) => i.category === 'snack').map((item) => (
-              <div
-                key={item.id}
-                className="bg-orange-50 border border-orange-200 rounded-xl p-3 flex flex-col h-auto"
-              >
-                <div className="font-bold text-orange-900 leading-tight mb-1">{item.name}</div>
-                <div className="text-orange-600 font-medium mb-3">${item.price}</div>
-                <div className="mt-auto flex flex-col gap-2">
-                  <div className="flex items-center bg-white rounded-lg border border-orange-200 shadow-sm">
-                    <button onClick={() => setQty(item.id, -1)} className="p-1.5 flex-1 hover:bg-orange-100 rounded-l-lg text-orange-700 flex justify-center transition-colors">
-                      <Minus size={16} />
-                    </button>
-                    <span className="w-8 text-center font-semibold text-orange-900">{getQty(item.id)}</span>
-                    <button onClick={() => setQty(item.id, 1)} className="p-1.5 flex-1 hover:bg-orange-100 rounded-r-lg text-orange-700 flex justify-center transition-colors">
-                      <Plus size={16} />
+          <div>
+            <h2 className="text-sm font-semibold text-slate-500 mb-3 uppercase tracking-wider flex items-center gap-2">
+              <Cookie size={16} /> 點心 (Snacks)
+            </h2>
+            <div className="grid grid-cols-2 gap-3">
+              {MENU_ITEMS.filter((i) => i.category === 'snack').map((item) => (
+                <div
+                  key={item.id}
+                  className="bg-orange-50 border border-orange-200 rounded-xl p-3 flex flex-col h-auto"
+                >
+                  <div className="font-bold text-orange-900 leading-tight mb-1">{item.name}</div>
+                  <div className="text-orange-600 font-medium mb-3">${item.price}</div>
+                  <div className="mt-auto flex flex-col gap-2">
+                    <div className="flex items-center bg-white rounded-lg border border-orange-200 shadow-sm">
+                      <button onClick={() => setQty(item.id, -1)} className="p-1.5 flex-1 hover:bg-orange-100 rounded-l-lg text-orange-700 flex justify-center transition-colors">
+                        <Minus size={16} />
+                      </button>
+                      <span className="w-8 text-center font-semibold text-orange-900">{getQty(item.id)}</span>
+                      <button onClick={() => setQty(item.id, 1)} className="p-1.5 flex-1 hover:bg-orange-100 rounded-r-lg text-orange-700 flex justify-center transition-colors">
+                        <Plus size={16} />
+                      </button>
+                    </div>
+                    <button
+                      onClick={() => handleAddToCart(item)}
+                      className="w-full bg-orange-600 hover:bg-orange-700 text-white py-1.5 rounded-lg text-sm font-bold shadow-sm transition-colors active:scale-95"
+                    >
+                      加入
                     </button>
                   </div>
-                  <button
-                    onClick={() => handleAddToCart(item)}
-                    className="w-full bg-orange-600 hover:bg-orange-700 text-white py-1.5 rounded-lg text-sm font-bold shadow-sm transition-colors active:scale-95"
-                  >
-                    加入
-                  </button>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
+          </div>
+
+          {/* Current Order Summary (Moved below menu items) */}
+          <div className="mt-4 border-t border-slate-200 pt-4">
+            <h3 className="font-bold text-slate-700 mb-3 flex items-center gap-2">
+              <ShoppingCart size={18} /> 目前訂單
+            </h3>
+            
+            <div className="space-y-2 mb-4">
+              {currentOrder.length === 0 ? (
+                <div className="py-6 flex items-center justify-center text-slate-400 text-sm bg-slate-50 rounded-xl border border-dashed border-slate-200">
+                  尚未選擇餐點
+                </div>
+              ) : (
+                currentOrder.map((item) => (
+                  <div key={item.id} className="flex items-center justify-between bg-white p-2 rounded-lg border border-slate-200 shadow-sm">
+                    <div className="flex-1 min-w-0 pr-2">
+                      <div className="font-medium text-slate-800 truncate">{item.name}</div>
+                      <div className="text-slate-500 text-sm">${item.price}</div>
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <div className="flex items-center bg-slate-100 rounded-lg border border-slate-200">
+                        <button onClick={() => updateQuantity(item.id, -1)} className="p-1.5 hover:bg-slate-200 rounded-l-lg text-slate-600 transition-colors">
+                          <Minus size={14} />
+                        </button>
+                        <span className="w-6 text-center font-semibold text-slate-800 text-sm">{item.quantity}</span>
+                        <button onClick={() => updateQuantity(item.id, 1)} className="p-1.5 hover:bg-slate-200 rounded-r-lg text-slate-600 transition-colors">
+                          <Plus size={14} />
+                        </button>
+                      </div>
+                      <button onClick={() => removeFromOrder(item.id)} className="text-red-400 hover:text-red-600 p-1.5 transition-colors">
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
           </div>
         </div>
 
-        {/* Current Order Summary */}
-        <div className="bg-slate-50 p-4 flex flex-col flex-1 min-h-0">
-          <h3 className="font-bold text-slate-700 mb-2 flex items-center gap-2 shrink-0">
-            <ShoppingCart size={18} /> 目前訂單
-          </h3>
-          
-          <div className="flex-1 overflow-y-auto mb-4 pr-2 space-y-2">
-            {currentOrder.length === 0 ? (
-              <div className="h-full flex items-center justify-center text-slate-400 text-sm">
-                尚未選擇餐點
-              </div>
-            ) : (
-              currentOrder.map((item) => (
-                <div key={item.id} className="flex items-center justify-between bg-white p-2 rounded-lg border border-slate-200 shadow-sm">
-                  <div className="flex-1 min-w-0 pr-2">
-                    <div className="font-medium text-slate-800 truncate">{item.name}</div>
-                    <div className="text-slate-500 text-sm">${item.price}</div>
-                  </div>
-                  <div className="flex items-center gap-2 shrink-0">
-                    <div className="flex items-center bg-slate-100 rounded-lg border border-slate-200">
-                      <button onClick={() => updateQuantity(item.id, -1)} className="p-1.5 hover:bg-slate-200 rounded-l-lg text-slate-600 transition-colors">
-                        <Minus size={14} />
-                      </button>
-                      <span className="w-6 text-center font-semibold text-slate-800 text-sm">{item.quantity}</span>
-                      <button onClick={() => updateQuantity(item.id, 1)} className="p-1.5 hover:bg-slate-200 rounded-r-lg text-slate-600 transition-colors">
-                        <Plus size={14} />
-                      </button>
-                    </div>
-                    <button onClick={() => removeFromOrder(item.id)} className="text-red-400 hover:text-red-600 p-1.5 transition-colors">
-                      <Trash2 size={16} />
-                    </button>
-                  </div>
-                </div>
-              ))
-            )}
+        {/* Checkout Button Area (Fixed at bottom) */}
+        <div className="bg-slate-50 p-4 border-t border-slate-200 shrink-0">
+          <div className="flex justify-between items-end mb-4">
+            <span className="text-slate-500 font-medium">總計</span>
+            <span className="text-3xl font-bold text-slate-800">${currentTotal}</span>
           </div>
-          
-          <div className="shrink-0 mt-auto pt-2 border-t border-slate-200">
-            <div className="flex justify-between items-end mb-4">
-              <span className="text-slate-500 font-medium">總計</span>
-              <span className="text-3xl font-bold text-slate-800">${currentTotal}</span>
-            </div>
-            <button
-              onClick={submitOrder}
-              disabled={currentOrder.length === 0}
-              className="w-full bg-emerald-500 hover:bg-emerald-600 disabled:bg-slate-300 disabled:text-slate-500 disabled:cursor-not-allowed text-white font-bold text-xl py-4 rounded-xl shadow-sm transition-colors active:scale-[0.98] flex items-center justify-center gap-2"
-            >
-              結帳 / 送出訂單
-            </button>
-          </div>
+          <button
+            onClick={submitOrder}
+            disabled={currentOrder.length === 0}
+            className="w-full bg-emerald-500 hover:bg-emerald-600 disabled:bg-slate-300 disabled:text-slate-500 disabled:cursor-not-allowed text-white font-bold text-xl py-4 rounded-xl shadow-sm transition-colors active:scale-[0.98] flex items-center justify-center gap-2"
+          >
+            結帳 / 送出訂單
+          </button>
         </div>
       </div>
 
@@ -262,7 +268,7 @@ export default function App() {
                     animate={{ opacity: 1, scale: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0.8, transition: { duration: 0.2 } }}
                     key={order.id}
-                    className="bg-white rounded-2xl shadow-sm border border-slate-200 flex flex-col overflow-hidden aspect-square"
+                    className="bg-white rounded-2xl shadow-sm border border-slate-200 flex flex-col overflow-hidden min-h-[250px]"
                   >
                     {/* Order Header */}
                     <div className="bg-amber-100 px-4 py-3 border-b border-amber-200 flex justify-between items-center shrink-0">
