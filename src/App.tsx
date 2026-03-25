@@ -5,7 +5,7 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Coffee, Cookie, Trash2, CheckCircle, Plus, Minus, ShoppingCart } from 'lucide-react';
+import { Coffee, Cookie, Trash2, CheckCircle, Plus, Minus, ShoppingCart, Receipt, FileSpreadsheet, X } from 'lucide-react';
 
 // Types
 type MenuItem = {
@@ -38,8 +38,10 @@ const MENU_ITEMS: MenuItem[] = [
 export default function App() {
   const [currentOrder, setCurrentOrder] = useState<OrderItem[]>([]);
   const [orderQueue, setOrderQueue] = useState<Order[]>([]);
+  const [salesHistory, setSalesHistory] = useState<Order[]>([]);
   const [orderCounter, setOrderCounter] = useState(1);
   const [itemQuantities, setItemQuantities] = useState<Record<string, number>>({});
+  const [showReport, setShowReport] = useState(false);
 
   const getQty = (id: string) => itemQuantities[id] || 1;
   const setQty = (id: string, delta: number) => {
@@ -96,6 +98,7 @@ export default function App() {
     };
 
     setOrderQueue((prev) => [...prev, newOrder]);
+    setSalesHistory((prev) => [...prev, newOrder]);
     setOrderCounter((prev) => prev + 1);
     setCurrentOrder([]);
   };
@@ -104,13 +107,57 @@ export default function App() {
     setOrderQueue((prev) => prev.filter((o) => o.id !== orderId));
   };
 
+  const getSalesSummary = () => {
+    const summary: Record<string, { name: string; price: number; quantity: number; total: number }> = {};
+    MENU_ITEMS.forEach(item => {
+      summary[item.id] = { name: item.name, price: item.price, quantity: 0, total: 0 };
+    });
+    salesHistory.forEach(order => {
+      order.items.forEach(item => {
+        if (summary[item.id]) {
+          summary[item.id].quantity += item.quantity;
+          summary[item.id].total += item.price * item.quantity;
+        }
+      });
+    });
+    return Object.values(summary).filter(item => item.quantity > 0);
+  };
+
+  const exportToExcel = () => {
+    const summary = getSalesSummary();
+    const grandTotal = summary.reduce((sum, item) => sum + item.total, 0);
+
+    let csvContent = '\uFEFF'; // BOM for UTF-8
+    csvContent += '商品名稱,單價,銷售數量,總金額\n';
+    summary.forEach(item => {
+      csvContent += `${item.name},${item.price},${item.quantity},${item.total}\n`;
+    });
+    csvContent += `總計,,,${grandTotal}\n`;
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `今日結帳明細_${new Date().toLocaleDateString()}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <div className="flex h-screen w-full bg-slate-100 p-4 gap-4 font-sans overflow-hidden select-none">
       {/* Left Panel: POS / Menu (1/3 width) */}
       <div className="w-1/3 min-w-[320px] max-w-[400px] bg-white rounded-2xl shadow-sm border border-slate-200 flex flex-col overflow-hidden">
         {/* Header */}
-        <div className="bg-slate-800 text-white p-4 text-center shrink-0">
+        <div className="bg-slate-800 text-white p-4 flex justify-between items-center shrink-0">
           <h1 className="text-xl font-bold tracking-wider">園遊會點餐系統</h1>
+          <button 
+            onClick={() => setShowReport(true)} 
+            className="flex items-center gap-1.5 text-sm bg-slate-700 hover:bg-slate-600 px-3 py-1.5 rounded-lg transition-colors active:scale-95"
+          >
+            <Receipt size={16} /> 今日結帳
+          </button>
         </div>
 
         {/* Menu Grid - Scrollable area */}
@@ -313,6 +360,98 @@ export default function App() {
           )}
         </div>
       </div>
+
+      {/* Report Modal */}
+      <AnimatePresence>
+        {showReport && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="bg-white rounded-2xl shadow-xl w-full max-w-2xl overflow-hidden flex flex-col max-h-full"
+            >
+              <div className="bg-slate-800 text-white p-4 flex justify-between items-center shrink-0">
+                <h2 className="text-xl font-bold flex items-center gap-2">
+                  <Receipt size={24} />
+                  今日結帳明細
+                </h2>
+                <button 
+                  onClick={() => setShowReport(false)}
+                  className="p-1.5 hover:bg-slate-700 rounded-lg transition-colors"
+                >
+                  <X size={24} />
+                </button>
+              </div>
+              
+              <div className="p-6 overflow-y-auto flex-1">
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="border-b-2 border-slate-200 text-slate-500">
+                      <th className="pb-3 font-semibold">商品名稱</th>
+                      <th className="pb-3 font-semibold text-right">單價</th>
+                      <th className="pb-3 font-semibold text-right">銷售數量</th>
+                      <th className="pb-3 font-semibold text-right">總金額</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {getSalesSummary().length === 0 ? (
+                      <tr>
+                        <td colSpan={4} className="py-8 text-center text-slate-400">
+                          今日尚無銷售紀錄
+                        </td>
+                      </tr>
+                    ) : (
+                      getSalesSummary().map((item, idx) => (
+                        <tr key={idx} className="border-b border-slate-100 last:border-0">
+                          <td className="py-3 font-medium text-slate-800">{item.name}</td>
+                          <td className="py-3 text-right text-slate-600">${item.price}</td>
+                          <td className="py-3 text-right font-bold text-slate-800">{item.quantity}</td>
+                          <td className="py-3 text-right font-bold text-emerald-600">${item.total}</td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                  {getSalesSummary().length > 0 && (
+                    <tfoot>
+                      <tr className="border-t-2 border-slate-800">
+                        <td colSpan={3} className="pt-4 text-right font-bold text-slate-800 text-lg">
+                          營業總額：
+                        </td>
+                        <td className="pt-4 text-right font-black text-emerald-600 text-2xl">
+                          ${getSalesSummary().reduce((sum, item) => sum + item.total, 0)}
+                        </td>
+                      </tr>
+                    </tfoot>
+                  )}
+                </table>
+              </div>
+
+              <div className="bg-slate-50 p-4 border-t border-slate-200 flex justify-end gap-3 shrink-0">
+                <button
+                  onClick={() => setShowReport(false)}
+                  className="px-6 py-2.5 rounded-xl font-bold text-slate-600 hover:bg-slate-200 transition-colors"
+                >
+                  關閉
+                </button>
+                <button
+                  onClick={exportToExcel}
+                  disabled={getSalesSummary().length === 0}
+                  className="px-6 py-2.5 rounded-xl font-bold text-white bg-blue-600 hover:bg-blue-700 disabled:bg-slate-300 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
+                >
+                  <FileSpreadsheet size={20} />
+                  匯出 Excel (CSV)
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
