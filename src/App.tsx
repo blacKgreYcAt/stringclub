@@ -13,6 +13,7 @@ type MenuItem = {
   name: string;
   price: number;
   category: 'drink' | 'snack';
+  theme?: 'red' | 'blue' | 'green' | 'yellow' | 'orange';
 };
 
 type OrderItem = MenuItem & {
@@ -27,13 +28,66 @@ type Order = {
 };
 
 const MENU_ITEMS: MenuItem[] = [
-  { id: 'd1', name: '貝多芬的憤怒', price: 50, category: 'drink' },
-  { id: 'd2', name: '柴可夫斯基的眼淚', price: 50, category: 'drink' },
-  { id: 'd3', name: '韋瓦第的春天', price: 50, category: 'drink' },
-  { id: 'd4', name: '莫札特的微笑', price: 50, category: 'drink' },
-  { id: 's1', name: '聖桑的動物狂歡熱狗', price: 40, category: 'snack' },
-  { id: 's2', name: '德布西的印象甘草芭樂', price: 50, category: 'snack' },
+  { id: 'd1', name: '貝多芬的憤怒', price: 50, category: 'drink', theme: 'red' },
+  { id: 'd2', name: '柴可夫斯基的眼淚', price: 50, category: 'drink', theme: 'blue' },
+  { id: 'd3', name: '韋瓦第的春天', price: 50, category: 'drink', theme: 'green' },
+  { id: 'd4', name: '莫札特的微笑', price: 50, category: 'drink', theme: 'yellow' },
+  { id: 's1', name: '聖桑的動物狂歡熱狗', price: 40, category: 'snack', theme: 'orange' },
+  { id: 's2', name: '德布西的印象甘草芭樂', price: 50, category: 'snack', theme: 'orange' },
 ];
+
+const COLOR_MAP: Record<string, any> = {
+  red: {
+    container: 'bg-red-50 border-red-200',
+    title: 'text-red-900',
+    price: 'text-red-600',
+    qtyBorder: 'border-red-200',
+    qtyBtnHover: 'hover:bg-red-100',
+    qtyBtnText: 'text-red-700',
+    qtyText: 'text-red-900',
+    addBtn: 'bg-red-600 hover:bg-red-700 text-white',
+  },
+  blue: {
+    container: 'bg-blue-50 border-blue-200',
+    title: 'text-blue-900',
+    price: 'text-blue-600',
+    qtyBorder: 'border-blue-200',
+    qtyBtnHover: 'hover:bg-blue-100',
+    qtyBtnText: 'text-blue-700',
+    qtyText: 'text-blue-900',
+    addBtn: 'bg-blue-600 hover:bg-blue-700 text-white',
+  },
+  green: {
+    container: 'bg-emerald-50 border-emerald-200',
+    title: 'text-emerald-900',
+    price: 'text-emerald-600',
+    qtyBorder: 'border-emerald-200',
+    qtyBtnHover: 'hover:bg-emerald-100',
+    qtyBtnText: 'text-emerald-700',
+    qtyText: 'text-emerald-900',
+    addBtn: 'bg-emerald-600 hover:bg-emerald-700 text-white',
+  },
+  yellow: {
+    container: 'bg-amber-50 border-amber-200',
+    title: 'text-amber-900',
+    price: 'text-amber-600',
+    qtyBorder: 'border-amber-200',
+    qtyBtnHover: 'hover:bg-amber-100',
+    qtyBtnText: 'text-amber-700',
+    qtyText: 'text-amber-900',
+    addBtn: 'bg-amber-500 hover:bg-amber-600 text-white',
+  },
+  orange: {
+    container: 'bg-orange-50 border-orange-200',
+    title: 'text-orange-900',
+    price: 'text-orange-600',
+    qtyBorder: 'border-orange-200',
+    qtyBtnHover: 'hover:bg-orange-100',
+    qtyBtnText: 'text-orange-700',
+    qtyText: 'text-orange-900',
+    addBtn: 'bg-orange-600 hover:bg-orange-700 text-white',
+  }
+};
 
 export default function App() {
   const [currentOrder, setCurrentOrder] = useState<OrderItem[]>([]);
@@ -168,32 +222,35 @@ export default function App() {
               <Coffee size={16} /> 飲品 (Drinks)
             </h2>
             <div className="grid grid-cols-2 gap-3">
-              {MENU_ITEMS.filter((i) => i.category === 'drink').map((item) => (
-                <div
-                  key={item.id}
-                  className="bg-blue-50 border border-blue-200 rounded-xl p-3 flex flex-col h-auto"
-                >
-                  <div className="font-bold text-blue-900 leading-tight mb-1">{item.name}</div>
-                  <div className="text-blue-600 font-medium mb-3">${item.price}</div>
-                  <div className="mt-auto flex flex-col gap-2">
-                    <div className="flex items-center bg-white rounded-lg border border-blue-200 shadow-sm">
-                      <button onClick={() => setQty(item.id, -1)} className="p-1.5 flex-1 hover:bg-blue-100 rounded-l-lg text-blue-700 flex justify-center transition-colors">
-                        <Minus size={16} />
-                      </button>
-                      <span className="w-8 text-center font-semibold text-blue-900">{getQty(item.id)}</span>
-                      <button onClick={() => setQty(item.id, 1)} className="p-1.5 flex-1 hover:bg-blue-100 rounded-r-lg text-blue-700 flex justify-center transition-colors">
-                        <Plus size={16} />
+              {MENU_ITEMS.filter((i) => i.category === 'drink').map((item) => {
+                const theme = COLOR_MAP[item.theme || 'blue'];
+                return (
+                  <div
+                    key={item.id}
+                    className={`${theme.container} rounded-xl p-3 flex flex-col h-auto`}
+                  >
+                    <div className={`font-bold ${theme.title} leading-tight mb-1`}>{item.name}</div>
+                    <div className={`${theme.price} font-medium mb-3`}>${item.price}</div>
+                    <div className="mt-auto flex flex-col gap-2">
+                      <div className={`flex items-center bg-white rounded-lg border ${theme.qtyBorder} shadow-sm`}>
+                        <button onClick={() => setQty(item.id, -1)} className={`p-1.5 flex-1 ${theme.qtyBtnHover} rounded-l-lg ${theme.qtyBtnText} flex justify-center transition-colors`}>
+                          <Minus size={16} />
+                        </button>
+                        <span className={`w-8 text-center font-semibold ${theme.qtyText}`}>{getQty(item.id)}</span>
+                        <button onClick={() => setQty(item.id, 1)} className={`p-1.5 flex-1 ${theme.qtyBtnHover} rounded-r-lg ${theme.qtyBtnText} flex justify-center transition-colors`}>
+                          <Plus size={16} />
+                        </button>
+                      </div>
+                      <button
+                        onClick={() => handleAddToCart(item)}
+                        className={`w-full ${theme.addBtn} py-1.5 rounded-lg text-sm font-bold shadow-sm transition-colors active:scale-95`}
+                      >
+                        加入
                       </button>
                     </div>
-                    <button
-                      onClick={() => handleAddToCart(item)}
-                      className="w-full bg-blue-600 hover:bg-blue-700 text-white py-1.5 rounded-lg text-sm font-bold shadow-sm transition-colors active:scale-95"
-                    >
-                      加入
-                    </button>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
 
@@ -202,32 +259,35 @@ export default function App() {
               <Cookie size={16} /> 點心 (Snacks)
             </h2>
             <div className="grid grid-cols-2 gap-3">
-              {MENU_ITEMS.filter((i) => i.category === 'snack').map((item) => (
-                <div
-                  key={item.id}
-                  className="bg-orange-50 border border-orange-200 rounded-xl p-3 flex flex-col h-auto"
-                >
-                  <div className="font-bold text-orange-900 leading-tight mb-1">{item.name}</div>
-                  <div className="text-orange-600 font-medium mb-3">${item.price}</div>
-                  <div className="mt-auto flex flex-col gap-2">
-                    <div className="flex items-center bg-white rounded-lg border border-orange-200 shadow-sm">
-                      <button onClick={() => setQty(item.id, -1)} className="p-1.5 flex-1 hover:bg-orange-100 rounded-l-lg text-orange-700 flex justify-center transition-colors">
-                        <Minus size={16} />
-                      </button>
-                      <span className="w-8 text-center font-semibold text-orange-900">{getQty(item.id)}</span>
-                      <button onClick={() => setQty(item.id, 1)} className="p-1.5 flex-1 hover:bg-orange-100 rounded-r-lg text-orange-700 flex justify-center transition-colors">
-                        <Plus size={16} />
+              {MENU_ITEMS.filter((i) => i.category === 'snack').map((item) => {
+                const theme = COLOR_MAP[item.theme || 'orange'];
+                return (
+                  <div
+                    key={item.id}
+                    className={`${theme.container} rounded-xl p-3 flex flex-col h-auto`}
+                  >
+                    <div className={`font-bold ${theme.title} leading-tight mb-1`}>{item.name}</div>
+                    <div className={`${theme.price} font-medium mb-3`}>${item.price}</div>
+                    <div className="mt-auto flex flex-col gap-2">
+                      <div className={`flex items-center bg-white rounded-lg border ${theme.qtyBorder} shadow-sm`}>
+                        <button onClick={() => setQty(item.id, -1)} className={`p-1.5 flex-1 ${theme.qtyBtnHover} rounded-l-lg ${theme.qtyBtnText} flex justify-center transition-colors`}>
+                          <Minus size={16} />
+                        </button>
+                        <span className={`w-8 text-center font-semibold ${theme.qtyText}`}>{getQty(item.id)}</span>
+                        <button onClick={() => setQty(item.id, 1)} className={`p-1.5 flex-1 ${theme.qtyBtnHover} rounded-r-lg ${theme.qtyBtnText} flex justify-center transition-colors`}>
+                          <Plus size={16} />
+                        </button>
+                      </div>
+                      <button
+                        onClick={() => handleAddToCart(item)}
+                        className={`w-full ${theme.addBtn} py-1.5 rounded-lg text-sm font-bold shadow-sm transition-colors active:scale-95`}
+                      >
+                        加入
                       </button>
                     </div>
-                    <button
-                      onClick={() => handleAddToCart(item)}
-                      className="w-full bg-orange-600 hover:bg-orange-700 text-white py-1.5 rounded-lg text-sm font-bold shadow-sm transition-colors active:scale-95"
-                    >
-                      加入
-                    </button>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
 
