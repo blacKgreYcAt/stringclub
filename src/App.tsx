@@ -89,6 +89,12 @@ export default function App() {
 
   const submitOrder = () => {
     if (currentOrder.length === 0) return;
+    
+    // Check if the order queue has reached its maximum capacity
+    if (orderQueue.length >= 12) {
+      alert("目前待製作的訂單已達上限 (12筆)，請先完成部分訂單後再繼續接單！");
+      return;
+    }
 
     const newOrder: Order = {
       id: orderCounter,
