@@ -150,14 +150,8 @@ export default function App() {
       {/* Left Panel: POS / Menu (1/3 width) */}
       <div className="w-1/3 min-w-[320px] max-w-[400px] bg-white rounded-2xl shadow-sm border border-slate-200 flex flex-col overflow-hidden">
         {/* Header */}
-        <div className="bg-slate-800 text-white p-4 flex justify-between items-center shrink-0">
+        <div className="bg-slate-800 text-white p-4 text-center shrink-0">
           <h1 className="text-xl font-bold tracking-wider">園遊會點餐系統</h1>
-          <button 
-            onClick={() => setShowReport(true)} 
-            className="flex items-center gap-1.5 text-sm bg-slate-700 hover:bg-slate-600 px-3 py-1.5 rounded-lg transition-colors active:scale-95"
-          >
-            <Receipt size={16} /> 今日結帳
-          </button>
         </div>
 
         {/* Menu Grid - Scrollable area */}
@@ -296,6 +290,13 @@ export default function App() {
               </span>
             )}
           </h2>
+          <button 
+            onClick={() => setShowReport(true)} 
+            className="flex items-center gap-2 bg-white border-2 border-slate-300 hover:border-slate-400 hover:bg-slate-50 text-slate-700 px-4 py-2 rounded-xl font-bold transition-colors active:scale-95 shadow-sm"
+          >
+            <Receipt size={20} /> 
+            今日結帳與報表
+          </button>
         </div>
 
         <div className="flex-1 overflow-y-auto pr-2">
