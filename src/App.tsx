@@ -42,6 +42,7 @@ export default function App() {
   const [orderCounter, setOrderCounter] = useState(1);
   const [itemQuantities, setItemQuantities] = useState<Record<string, number>>({});
   const [showReport, setShowReport] = useState(false);
+  const [showLimitWarning, setShowLimitWarning] = useState(false);
 
   const getQty = (id: string) => itemQuantities[id] || 1;
   const setQty = (id: string, delta: number) => {
@@ -92,7 +93,7 @@ export default function App() {
     
     // Check if the order queue has reached its maximum capacity
     if (orderQueue.length >= 12) {
-      alert("目前待製作的訂單已達上限 (12筆)，請先完成部分訂單後再繼續接單！");
+      setShowLimitWarning(true);
       return;
     }
 
@@ -453,6 +454,48 @@ export default function App() {
                 >
                   <FileSpreadsheet size={20} />
                   匯出 Excel (CSV)
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Limit Warning Modal */}
+      <AnimatePresence>
+        {showLimitWarning && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden flex flex-col"
+            >
+              <div className="bg-red-500 text-white p-4 flex justify-between items-center shrink-0">
+                <h2 className="text-xl font-bold flex items-center gap-2">
+                  ⚠️ 訂單已達上限
+                </h2>
+                <button 
+                  onClick={() => setShowLimitWarning(false)}
+                  className="p-1.5 hover:bg-red-600 rounded-lg transition-colors"
+                >
+                  <X size={24} />
+                </button>
+              </div>
+              <div className="p-6 text-slate-700 text-lg leading-relaxed">
+                目前待製作的訂單已達上限 (12筆)，請先完成部分訂單後再繼續接單！
+              </div>
+              <div className="bg-slate-50 p-4 border-t border-slate-200 flex justify-end shrink-0">
+                <button
+                  onClick={() => setShowLimitWarning(false)}
+                  className="px-6 py-2.5 rounded-xl font-bold text-white bg-red-500 hover:bg-red-600 transition-colors"
+                >
+                  我知道了
                 </button>
               </div>
             </motion.div>
