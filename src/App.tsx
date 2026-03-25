@@ -27,29 +27,40 @@ type Order = {
 };
 
 const MENU_ITEMS: MenuItem[] = [
-  { id: 'd1', name: '古早味紅茶', price: 20, category: 'drink' },
-  { id: 'd2', name: '茉香綠茶', price: 20, category: 'drink' },
-  { id: 'd3', name: '經典奶茶', price: 30, category: 'drink' },
-  { id: 'd4', name: '珍珠奶茶', price: 40, category: 'drink' },
-  { id: 's1', name: '原味熱狗', price: 30, category: 'snack' },
-  { id: 's2', name: '焦糖爆米花', price: 40, category: 'snack' },
+  { id: 'd1', name: '貝多芬的憤怒', price: 50, category: 'drink' },
+  { id: 'd2', name: '柴可夫斯基的眼淚', price: 50, category: 'drink' },
+  { id: 'd3', name: '韋瓦第的春天', price: 50, category: 'drink' },
+  { id: 'd4', name: '莫札特的微笑', price: 50, category: 'drink' },
+  { id: 's1', name: '聖桑的動物狂歡熱狗', price: 40, category: 'snack' },
+  { id: 's2', name: '德布西的印象甘草芭樂', price: 50, category: 'snack' },
 ];
 
 export default function App() {
   const [currentOrder, setCurrentOrder] = useState<OrderItem[]>([]);
   const [orderQueue, setOrderQueue] = useState<Order[]>([]);
   const [orderCounter, setOrderCounter] = useState(1);
+  const [itemQuantities, setItemQuantities] = useState<Record<string, number>>({});
 
-  const addToOrder = (item: MenuItem) => {
+  const getQty = (id: string) => itemQuantities[id] || 1;
+  const setQty = (id: string, delta: number) => {
+    setItemQuantities((prev) => ({
+      ...prev,
+      [id]: Math.max(1, (prev[id] || 1) + delta),
+    }));
+  };
+
+  const handleAddToCart = (item: MenuItem) => {
+    const qty = getQty(item.id);
     setCurrentOrder((prev) => {
       const existing = prev.find((i) => i.id === item.id);
       if (existing) {
         return prev.map((i) =>
-          i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i
+          i.id === item.id ? { ...i, quantity: i.quantity + qty } : i
         );
       }
-      return [...prev, { ...item, quantity: 1 }];
+      return [...prev, { ...item, quantity: qty }];
     });
+    setItemQuantities((prev) => ({ ...prev, [item.id]: 1 }));
   };
 
   const removeFromOrder = (itemId: string) => {
@@ -108,14 +119,30 @@ export default function App() {
           </h2>
           <div className="grid grid-cols-2 gap-3 mb-6">
             {MENU_ITEMS.filter((i) => i.category === 'drink').map((item) => (
-              <button
+              <div
                 key={item.id}
-                onClick={() => addToOrder(item)}
-                className="bg-blue-50 hover:bg-blue-100 text-blue-900 border border-blue-200 rounded-xl p-3 flex flex-col items-center justify-center transition-colors active:scale-95 h-24"
+                className="bg-blue-50 border border-blue-200 rounded-xl p-3 flex flex-col h-auto"
               >
-                <span className="font-bold text-lg mb-1">{item.name}</span>
-                <span className="text-blue-600 font-medium">${item.price}</span>
-              </button>
+                <div className="font-bold text-blue-900 leading-tight mb-1">{item.name}</div>
+                <div className="text-blue-600 font-medium mb-3">${item.price}</div>
+                <div className="mt-auto flex flex-col gap-2">
+                  <div className="flex items-center bg-white rounded-lg border border-blue-200 shadow-sm">
+                    <button onClick={() => setQty(item.id, -1)} className="p-1.5 flex-1 hover:bg-blue-100 rounded-l-lg text-blue-700 flex justify-center transition-colors">
+                      <Minus size={16} />
+                    </button>
+                    <span className="w-8 text-center font-semibold text-blue-900">{getQty(item.id)}</span>
+                    <button onClick={() => setQty(item.id, 1)} className="p-1.5 flex-1 hover:bg-blue-100 rounded-r-lg text-blue-700 flex justify-center transition-colors">
+                      <Plus size={16} />
+                    </button>
+                  </div>
+                  <button
+                    onClick={() => handleAddToCart(item)}
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white py-1.5 rounded-lg text-sm font-bold shadow-sm transition-colors active:scale-95"
+                  >
+                    加入
+                  </button>
+                </div>
+              </div>
             ))}
           </div>
 
@@ -124,14 +151,30 @@ export default function App() {
           </h2>
           <div className="grid grid-cols-2 gap-3">
             {MENU_ITEMS.filter((i) => i.category === 'snack').map((item) => (
-              <button
+              <div
                 key={item.id}
-                onClick={() => addToOrder(item)}
-                className="bg-orange-50 hover:bg-orange-100 text-orange-900 border border-orange-200 rounded-xl p-3 flex flex-col items-center justify-center transition-colors active:scale-95 h-24"
+                className="bg-orange-50 border border-orange-200 rounded-xl p-3 flex flex-col h-auto"
               >
-                <span className="font-bold text-lg mb-1">{item.name}</span>
-                <span className="text-orange-600 font-medium">${item.price}</span>
-              </button>
+                <div className="font-bold text-orange-900 leading-tight mb-1">{item.name}</div>
+                <div className="text-orange-600 font-medium mb-3">${item.price}</div>
+                <div className="mt-auto flex flex-col gap-2">
+                  <div className="flex items-center bg-white rounded-lg border border-orange-200 shadow-sm">
+                    <button onClick={() => setQty(item.id, -1)} className="p-1.5 flex-1 hover:bg-orange-100 rounded-l-lg text-orange-700 flex justify-center transition-colors">
+                      <Minus size={16} />
+                    </button>
+                    <span className="w-8 text-center font-semibold text-orange-900">{getQty(item.id)}</span>
+                    <button onClick={() => setQty(item.id, 1)} className="p-1.5 flex-1 hover:bg-orange-100 rounded-r-lg text-orange-700 flex justify-center transition-colors">
+                      <Plus size={16} />
+                    </button>
+                  </div>
+                  <button
+                    onClick={() => handleAddToCart(item)}
+                    className="w-full bg-orange-600 hover:bg-orange-700 text-white py-1.5 rounded-lg text-sm font-bold shadow-sm transition-colors active:scale-95"
+                  >
+                    加入
+                  </button>
+                </div>
+              </div>
             ))}
           </div>
         </div>
