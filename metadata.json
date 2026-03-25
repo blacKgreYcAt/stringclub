@@ -1,0 +1,5 @@
+{
+  "name": "School Fair POS",
+  "description": "A Point of Sale and order queue management app for a school fair booth, designed for tablet landscape mode.",
+  "requestFramePermissions": []
+}
