@@ -28,10 +28,10 @@ type Order = {
 };
 
 const MENU_ITEMS: MenuItem[] = [
-  { id: 'd1', name: '貝多芬的憤怒', price: 50, category: 'drink', theme: 'red' },
-  { id: 'd2', name: '柴可夫斯基的眼淚', price: 50, category: 'drink', theme: 'blue' },
-  { id: 'd3', name: '韋瓦第的春天', price: 50, category: 'drink', theme: 'green' },
-  { id: 'd4', name: '莫札特的微笑', price: 50, category: 'drink', theme: 'yellow' },
+  { id: 'd1', name: '貝多芬的憤怒紅', price: 50, category: 'drink', theme: 'red' },
+  { id: 'd2', name: '柴可夫斯基的眼淚藍', price: 50, category: 'drink', theme: 'blue' },
+  { id: 'd3', name: '韋瓦第的春天綠', price: 50, category: 'drink', theme: 'green' },
+  { id: 'd4', name: '莫札特的微笑黃', price: 50, category: 'drink', theme: 'yellow' },
   { id: 's1', name: '聖桑的動物狂歡熱狗', price: 40, category: 'snack', theme: 'orange' },
   { id: 's2', name: '德布西的印象甘草芭樂', price: 50, category: 'snack', theme: 'orange' },
 ];
@@ -212,7 +212,7 @@ export default function App() {
       <div className="w-1/3 min-w-[320px] max-w-[400px] bg-white rounded-2xl shadow-sm border border-slate-200 flex flex-col overflow-hidden">
         {/* Header */}
         <div className="bg-slate-800 text-white p-4 text-center shrink-0">
-          <h1 className="text-xl font-bold tracking-wider">園遊會點餐系統</h1>
+          <h1 className="text-xl font-bold tracking-wider">五弦POS</h1>
         </div>
 
         {/* Menu Grid - Scrollable area */}
